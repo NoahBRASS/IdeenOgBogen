@@ -1,0 +1,16 @@
+# VS Code
+.vscode/
+
+# C#
+bin/
+obj/
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# OS
+Thumbs.db
+.DS_Store
