@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/IdeenOgBogen.Api/IdeenOgBogen.Api.csproj" />
+    <Project Path="src/IdeenOgBogen.Application/IdeenOgBogen.Application.csproj" />
+    <Project Path="src/IdeenOgBogen.Domain/IdeenOgBogen.Domain.csproj" />
+    <Project Path="src/IdeenOgBogen.Infrastructure/IdeenOgBogen.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/IdeenOgBogen.Tests/IdeenOgBogen.Tests.csproj" />
+  </Folder>
+</Solution>
