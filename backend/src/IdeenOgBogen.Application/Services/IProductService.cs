@@ -1,11 +1,10 @@
-using IdeenOgBogen.Domain.Models;
+using IdeenOgBogen.Application.DTOs.Products;
 
-namespace IdeenOgBogen.Application.Ports;
+namespace IdeenOgBogen.Application.Services;
 
-public interface IProductRepository
+public interface IProductService
 {
-    Task<List<Product>> GetAllAsync();
-    Task<Product?> GetByIdAsync(int id);
-    Task<Product> CreateAsync(Product product);
-    Task<bool> SKUExistsAsync(string sku);
+    Task<List<ProductResponseDto>> GetAllProductsAsync();
+    Task<ProductResponseDto?> GetProductByIdAsync(int id);
+    Task<ProductResponseDto> CreateProductAsync(CreateProductDto dto);
 }
