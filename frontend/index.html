@@ -1,74 +1,55 @@
 <!DOCTYPE html>
 <html lang="da">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ideen og Bogen</title>
+  <title>IdéenOgBogen</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <header class="site-header">
+    <h1>IdéenOgBogen</h1>
 
-  <header>
-    <div class="left-header">
-      <img src="img/bookstore-logo.png" alt="Ideen og Bogen logo" class="logo-img">
-      <div class="logo">Ideen og Bogen</div>
-      <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    </div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
     <nav class="menu">
-      <a href="#">Forside</a>
-      <a href="#">Bøger</a>
-      <a href="#">Kategorier</a>
-      <a href="#">Om os</a>
-      <a href="#">Kontakt</a>
+      <a href="#books">Bøger</a>
+      <a href="#about">Om os</a>
     </nav>
   </header>
 
-  <section class="hero">
-    <div class="svg-container">
-      <svg class="animated-rect" width="100%" height="100%" viewBox="0 0 1000 500">
-        <rect x="0" y="0" width="1000" height="500" />
-      </svg>
+  <main>
+    <section class="hero">
+      <h2>Velkommen til IdéenOgBogen</h2>
+      <p>En simpel boghandel med produkter hentet fra vores ASP.NET API.</p>
 
-      <div class="hero-content">
-        <h1>Velkommen til Ideen og Bogen</h1>
-        <p>En boghandel med romaner, fagbøger, klassikere og inspiration til alle læsere.</p>
-        <button type="button">Se vores bøger</button>
+      <button type="button" onclick="document.getElementById('books').scrollIntoView({ behavior: 'smooth' })">
+        Se vores bøger
+      </button>
+    </section>
+
+    <section class="featured-books" id="books">
+      <h2>Bøger fra API</h2>
+      <p id="products-status" class="products-status">Indlæser bøger...</p>
+
+      <div id="product-list" class="book-grid">
+        <!-- Products from API are inserted here by script.js -->
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="featured-books">
-    <h2>Udvalgte bøger</h2>
-
-    <div class="book-grid">
-      <article class="book-card">
-        <h3>Harry Potter</h3>
-        <p>Fantasy</p>
-        <span>199 kr.</span>
-      </article>
-
-      <article class="book-card">
-        <h3>The Hobbit</h3>
-        <p>Klassisk fantasy</p>
-        <span>149 kr.</span>
-      </article>
-
-      <article class="book-card">
-        <h3>Atomic Habits</h3>
-        <p>Personlig udvikling</p>
-        <span>229 kr.</span>
-      </article>
-    </div>
-  </section>
+    <section id="about" class="about-section">
+      <h2>Om projektet</h2>
+      <p>
+        Dette er vores MVP til serversideprogrammering. Frontend henter produkter fra backend,
+        som bruger EF Core og MySQL via Docker.
+      </p>
+    </section>
+  </main>
 
   <footer>
-    © 2026 Ideen og Bogen - Din lokale boghandel
+    <p>&copy; 2026 IdéenOgBogen</p>
   </footer>
 
   <script src="script.js"></script>
 </body>
-
 </html>
