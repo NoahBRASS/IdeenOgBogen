@@ -1,216 +1,223 @@
-@startuml name ERD
-title Idéen og Bogen - Opdateret ERD
+@startuml IdeenOgBogen - ERD
+title IdeenOgBogen - Entity Relationship Diagram
 
+left to right direction
 hide circle
+
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Times New Roman
+skinparam WrapWidth 260
 skinparam linetype ortho
+
 skinparam entity {
     BackgroundColor #F8F8F8
     BorderColor #333333
 }
 
-' =========================
-' Brugere og roller
-' =========================
+folder "IdeenOgBogen - Database Model" #Salmon {
 
-entity "Roles" as Roles {
-    * RoleId : int <<PK>>
-    --
-    RoleName : varchar(50) <<UNIQUE>>
+    legend left
+        Colors / stereotypes
+        ---
+        Salmon = IdeenOgBogen - Database Model
+        Red = Users / Roles
+        Yellow = Products / Categories
+        LightGreen = Orders / Payments
+        LightBlue = Books / Authors
+        <<PK>>, <<FK>>, <<UNIQUE>>, <<nullable>>
+    endlegend
+
+    package "Users and Roles" #Red {
+
+        entity "Roles" as Roles {
+            * RoleId : int <<PK>>
+            --
+            RoleName : varchar(50) <<UNIQUE>>
+        }
+
+        entity "Users" as Users {
+            * UserId : int <<PK>>
+            --
+            RoleId : int <<FK>>
+            Username : varchar(50) <<UNIQUE>>
+            Email : varchar(100) <<UNIQUE>>
+            PasswordHash : varchar(255)
+            IsActive : bit
+            CreatedAt : datetime
+        }
+
+        entity "Customers" as Customers {
+            * CustomerId : int <<PK>>
+            --
+            UserId : int <<FK, UNIQUE>>
+            FullName : varchar(100)
+            Phone : varchar(20)
+            Address : varchar(150)
+            PostalCode : varchar(20)
+            City : varchar(50)
+        }
+    }
+
+    package "Products and Categories" #Yellow {
+
+        entity "Categories" as Categories {
+            * CategoryId : int <<PK>>
+            --
+            ParentCategoryId : int <<FK, nullable>>
+            Name : varchar(100)
+            Description : varchar(255)
+        }
+
+        entity "ProductStatuses" as ProductStatuses {
+            * ProductStatusId : int <<PK>>
+            --
+            StatusName : varchar(50)
+            IsSellable : bit
+        }
+
+        entity "Products" as Products {
+            * ProductId : int <<PK>>
+            --
+            CategoryId : int <<FK>>
+            ProductStatusId : int <<FK>>
+            Name : varchar(150)
+            Description : varchar(500)
+            Price : decimal(10,2)
+            SKU : varchar(50) <<UNIQUE>>
+            CreatedAt : datetime
+        }
+
+        entity "Inventory" as Inventory {
+            * ProductId : int <<PK, FK>>
+            --
+            Quantity : int
+            LastUpdated : datetime
+        }
+    }
+
+    package "Orders and Payments" #LightGreen {
+
+        entity "Orders" as Orders {
+            * OrderId : int <<PK>>
+            --
+            CustomerId : int <<FK>>
+            OrderDate : datetime
+            OrderStatus : varchar(50)
+            TotalAmount : decimal(10,2)
+        }
+
+        entity "OrderItems" as OrderItems {
+            * OrderItemId : int <<PK>>
+            --
+            OrderId : int <<FK>>
+            ProductId : int <<FK>>
+            Quantity : int
+            UnitPrice : decimal(10,2)
+        }
+
+        entity "Payments" as Payments {
+            * PaymentId : int <<PK>>
+            --
+            OrderId : int <<FK, UNIQUE>>
+            Amount : decimal(10,2)
+            PaymentDate : datetime
+            PaymentMethod : varchar(50)
+            PaymentStatus : varchar(50)
+        }
+    }
+
+    package "Books and Authors" #LightBlue {
+
+        entity "BookDetails" as BookDetails {
+            * ProductId : int <<PK, FK>>
+            --
+            ISBN : varchar(20) <<UNIQUE>>
+            PublicationDate : date
+            Publisher : varchar(100)
+            Language : varchar(50)
+            PageCount : int
+        }
+
+        entity "Authors" as Authors {
+            * AuthorId : int <<PK>>
+            --
+            Name : varchar(100)
+            Biography : varchar(1000)
+        }
+
+        entity "BookAuthors" as BookAuthors {
+            * ProductId : int <<PK, FK>>
+            * AuthorId : int <<PK, FK>>
+        }
+    }
 }
 
-entity "Users" as Users {
-    * UserId : int <<PK>>
-    --
-    RoleId : int <<FK>>
-    Username : varchar(50) <<UNIQUE>>
-    Email : varchar(100) <<UNIQUE>>
-    PasswordHash : varchar(255)
-    IsActive : bit
-    CreatedAt : datetime
-}
+Roles ||--o{ Users : has
+Users ||--o| Customers : customer profile
 
-entity "Customers" as Customers {
-    * CustomerId : int <<PK>>
-    --
-    UserId : int <<FK, UNIQUE>>
-    FullName : varchar(100)
-    Phone : varchar(20)
-    Address : varchar(150)
-    PostalCode : varchar(20)
-    City : varchar(50)
-}
+Customers ||--o{ Orders : creates
+Orders ||--o{ OrderItems : contains
+Orders ||--o| Payments : paid by
 
-' =========================
-' Produkter og kategorier
-' =========================
+Products ||--o{ OrderItems : sold as
 
-entity "Categories" as Categories {
-    * CategoryId : int <<PK>>
-    --
-    ParentCategoryId : int <<FK, nullable>>
-    Name : varchar(100)
-    Description : varchar(255)
-}
+Categories ||--o{ Products : contains
+Categories ||--o{ Categories : parent / child
 
-entity "ProductStatus" as ProductStatus {
-    * ProductStatusId : int <<PK>>
-    --
-    StatusName : varchar(50)
-    IsSellable : bit
-}
+ProductStatuses ||--o{ Products : status
 
-entity "Products" as Products {
-    * ProductId : int <<PK>>
-    --
-    CategoryId : int <<FK>>
-    ProductStatusId : int <<FK>>
-    Name : varchar(150)
-    Description : varchar(500)
-    Price : decimal(10,2)
-    SKU : varchar(50) <<UNIQUE>>
-    CreatedAt : datetime
-}
+Products ||--|| Inventory : stock
+Products ||--o| BookDetails : book details
 
-entity "Inventory" as Inventory {
-    * ProductId : int <<PK, FK>>
-    --
-    Quantity : int
-    LastUpdated : datetime
-}
+BookDetails ||--o{ BookAuthors : has
+Authors ||--o{ BookAuthors : writes
 
-' =========================
-' Ordrer og betalinger
-' =========================
+note right of ProductStatuses
+ProductStatuses decides whether
+a product can be sold.
 
-entity "Orders" as Orders {
-    * OrderId : int <<PK>>
-    --
-    CustomerId : int <<FK>>
-    OrderDate : datetime
-    OrderStatus : varchar(50)
-    TotalAmount : decimal(10,2)
-}
-
-entity "OrderItems" as OrderItems {
-    * OrderItemId : int <<PK>>
-    --
-    OrderId : int <<FK>>
-    ProductId : int <<FK>>
-    Quantity : int
-    UnitPrice : decimal(10,2)
-}
-
-entity "Payments" as Payments {
-    * PaymentId : int <<PK>>
-    --
-    OrderId : int <<FK, UNIQUE>>
-    Amount : decimal(10,2)
-    PaymentDate : datetime
-    PaymentMethod : varchar(50)
-    PaymentStatus : varchar(50)
-}
-
-' =========================
-' Bøger og forfattere
-' =========================
-
-entity "BookDetails" as BookDetails {
-    * ProductId : int <<PK, FK>>
-    --
-    ISBN : varchar(20) <<UNIQUE>>
-    PublicationDate : date
-    Publisher : varchar(100)
-    Language : varchar(50)
-    PageCount : int
-}
-
-entity "Authors" as Authors {
-    * AuthorId : int <<PK>>
-    --
-    Name : varchar(100)
-    Biography : varchar(1000)
-}
-
-entity "BookAuthors" as BookAuthors {
-    * ProductId : int <<PK, FK>>
-    * AuthorId : int <<PK, FK>>
-}
-
-' =========================
-' Relationer
-' =========================
-
-Roles ||--o{ Users : "har"
-
-Users ||--o| Customers : "kundeprofil"
-
-Customers ||--o{ Orders : "opretter"
-
-Orders ||--o{ OrderItems : "indeholder"
-Orders ||--o| Payments : "betales via"
-
-Products ||--o{ OrderItems : "sælges som"
-
-Categories ||--o{ Products : "indeholder"
-Categories ||--o{ Categories : "parent/child"
-
-ProductStatus ||--o{ Products : "status"
-
-Products ||--|| Inventory : "lager"
-Products ||--o| BookDetails : "bogdetaljer"
-
-BookDetails ||--o{ BookAuthors : "har"
-Authors ||--o{ BookAuthors : "skriver"
-
-' =========================
-' Noter
-' =========================
-
-note right of ProductStatus
-ProductStatus bruges til at afgøre
-om et produkt kan sælges.
-
-Eksempler:
+Examples:
 - Active
 - OutOfStock
 - Discontinued
 end note
 
 note right of Products
-Products er hovedtabellen
-for alle salgbare varer.
+Products is the main table
+for all sellable items.
 
-Eksempler:
-- Bog
-- Notesbog
-- Kuglepen
-- Brætspil
+Examples:
+- Book
+- Notebook
+- Pen
+- Board game
 end note
 
 note bottom of OrderItems
-UnitPrice gemmes her,
-fordi produktets pris kan
-ændre sig senere.
+UnitPrice is stored here because
+the product price may change later.
 
-Ordren skal bevare købsprisen.
+The order must keep the purchase price.
 end note
 
 note bottom of Orders
-TotalAmount beregnes ud fra:
+TotalAmount is calculated from:
 
 OrderItems.Quantity * OrderItems.UnitPrice
 end note
 
 note bottom of BookAuthors
-BookAuthors er en koblingstabel
-til mange-til-mange relationen
-mellem bøger og forfattere.
+BookAuthors is a junction table
+for the many-to-many relation
+between books and authors.
 end note
 
 note right of Customers
-FullName er ændret fra varchar(10)
-til varchar(100), fordi 10 tegn
-er for kort til et fuldt navn.
+FullName uses varchar(100)
+because varchar(10) is too short
+for a full customer name.
 end note
 
 @enduml
