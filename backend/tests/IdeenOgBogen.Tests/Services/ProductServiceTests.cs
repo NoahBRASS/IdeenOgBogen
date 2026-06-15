@@ -10,14 +10,11 @@ public class ProductServiceTests
     [Fact]
     public async Task GetAllProductsAsync_ReturnsAllProducts()
     {
-        // Arrange
         var repository = new FakeProductRepository();
         var service = new ProductService(repository);
 
-        // Act
         var result = await service.GetAllProductsAsync();
 
-        // Assert
         Assert.Equal(2, result.Count);
         Assert.Contains(result, product => product.Name == "Clean Code");
         Assert.Contains(result, product => product.Name == "The Hobbit");
@@ -26,14 +23,11 @@ public class ProductServiceTests
     [Fact]
     public async Task GetProductByIdAsync_WhenProductExists_ReturnsProduct()
     {
-        // Arrange
         var repository = new FakeProductRepository();
         var service = new ProductService(repository);
 
-        // Act
         var result = await service.GetProductByIdAsync(1);
 
-        // Assert
         Assert.NotNull(result);
         Assert.Equal(1, result.ProductId);
         Assert.Equal("Clean Code", result.Name);
@@ -45,21 +39,17 @@ public class ProductServiceTests
     [Fact]
     public async Task GetProductByIdAsync_WhenProductDoesNotExist_ReturnsNull()
     {
-        // Arrange
         var repository = new FakeProductRepository();
         var service = new ProductService(repository);
 
-        // Act
         var result = await service.GetProductByIdAsync(999);
 
-        // Assert
         Assert.Null(result);
     }
 
     [Fact]
     public async Task CreateProductAsync_WhenSkuDoesNotExist_CreatesProduct()
     {
-        // Arrange
         var repository = new FakeProductRepository();
         var service = new ProductService(repository);
 
@@ -74,10 +64,8 @@ public class ProductServiceTests
             Quantity = 7
         };
 
-        // Act
         var result = await service.CreateProductAsync(dto);
 
-        // Assert
         Assert.NotNull(result);
         Assert.Equal("Refactoring", result.Name);
         Assert.Equal("BOOK-REFACTORING", result.SKU);
@@ -89,7 +77,6 @@ public class ProductServiceTests
     [Fact]
     public async Task CreateProductAsync_WhenSkuAlreadyExists_ThrowsInvalidOperationException()
     {
-        // Arrange
         var repository = new FakeProductRepository();
         var service = new ProductService(repository);
 
@@ -104,8 +91,50 @@ public class ProductServiceTests
             Quantity = 3
         };
 
-        // Act + Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateProductAsync(dto));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateProductAsync(dto));
+    }
+
+    [Fact]
+    public async Task CreateProductAsync_WhenPriceIsNegative_ThrowsArgumentOutOfRangeException()
+    {
+        var repository = new FakeProductRepository();
+        var service = new ProductService(repository);
+
+        var dto = new CreateProductDto
+        {
+            CategoryId = 2,
+            ProductStatusId = 1,
+            Name = "Invalid Price Book",
+            Description = "Invalid price test",
+            Price = -10,
+            SKU = "BOOK-INVALID-PRICE",
+            Quantity = 5
+        };
+
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            service.CreateProductAsync(dto));
+    }
+
+    [Fact]
+    public async Task CreateProductAsync_WhenNameIsEmpty_ThrowsArgumentException()
+    {
+        var repository = new FakeProductRepository();
+        var service = new ProductService(repository);
+
+        var dto = new CreateProductDto
+        {
+            CategoryId = 2,
+            ProductStatusId = 1,
+            Name = "   ",
+            Description = "Invalid name test",
+            Price = 99.95m,
+            SKU = "BOOK-INVALID-NAME",
+            Quantity = 5
+        };
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            service.CreateProductAsync(dto));
     }
 
     private sealed class FakeProductRepository : IProductRepository
