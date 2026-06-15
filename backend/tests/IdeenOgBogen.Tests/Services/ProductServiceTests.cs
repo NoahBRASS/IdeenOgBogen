@@ -4,9 +4,10 @@ using IdeenOgBogen.Application.Services;
 using IdeenOgBogen.Domain.Models;
 
 namespace IdeenOgBogen.Tests.Services;
-
+// The ProductServiceTests class contains unit tests for the ProductService, which manages products and interacts with the IProductRepository to perform operations on the database. These tests ensure that the service correctly retrieves, creates, and validates products, including handling edge cases such as duplicate SKUs, negative prices, and empty names.
 public class ProductServiceTests
 {
+    // Tests that GetAllProductsAsync returns all products from the database, including their related entities (Category, ProductStatus, Inventory)
     [Fact]
     public async Task GetAllProductsAsync_ReturnsAllProducts()
     {
@@ -20,6 +21,7 @@ public class ProductServiceTests
         Assert.Contains(result, product => product.Name == "The Hobbit");
     }
 
+    // Tests that GetProductByIdAsync returns the correct product with its related entities when the product exists in the database
     [Fact]
     public async Task GetProductByIdAsync_WhenProductExists_ReturnsProduct()
     {
@@ -36,6 +38,7 @@ public class ProductServiceTests
         Assert.Equal(10, result.Quantity);
     }
 
+    // Tests that GetProductByIdAsync returns null when the product does not exist in the database
     [Fact]
     public async Task GetProductByIdAsync_WhenProductDoesNotExist_ReturnsNull()
     {
@@ -47,6 +50,7 @@ public class ProductServiceTests
         Assert.Null(result);
     }
 
+    // Tests that CreateProductAsync creates a new product in the database and returns the created product with its related entities (Category, ProductStatus, Inventory)
     [Fact]
     public async Task CreateProductAsync_WhenSkuDoesNotExist_CreatesProduct()
     {
@@ -74,6 +78,7 @@ public class ProductServiceTests
         Assert.Equal(7, result.Quantity);
     }
 
+    // Tests that CreateProductAsync throws an InvalidOperationException when a product with the same SKU already exists in the database
     [Fact]
     public async Task CreateProductAsync_WhenSkuAlreadyExists_ThrowsInvalidOperationException()
     {
@@ -95,6 +100,7 @@ public class ProductServiceTests
             service.CreateProductAsync(dto));
     }
 
+    // Tests that CreateProductAsync throws an ArgumentOutOfRangeException when the price is negative
     [Fact]
     public async Task CreateProductAsync_WhenPriceIsNegative_ThrowsArgumentOutOfRangeException()
     {
@@ -116,6 +122,7 @@ public class ProductServiceTests
             service.CreateProductAsync(dto));
     }
 
+    // Tests that CreateProductAsync throws an ArgumentException when the name is empty or whitespace
     [Fact]
     public async Task CreateProductAsync_WhenNameIsEmpty_ThrowsArgumentException()
     {
@@ -137,6 +144,7 @@ public class ProductServiceTests
             service.CreateProductAsync(dto));
     }
 
+    // A fake implementation of the IProductRepository interface for testing purposes, which simulates a database with a predefined list of products and allows for creating new products and checking for SKU existence without interacting with an actual database.
     private sealed class FakeProductRepository : IProductRepository
     {
         private readonly List<Product> _products =
@@ -195,11 +203,13 @@ public class ProductServiceTests
             }
         ];
 
+        // Retrieves all products from the fake repository, including their related entities (Category, ProductStatus, Inventory)
         public Task<List<Product>> GetAllAsync()
         {
             return Task.FromResult(_products);
         }
 
+        // Retrieves a product by its ID from the fake repository, including its related entities (Category, ProductStatus, Inventory), or returns null if the product does not exist
         public Task<Product?> GetByIdAsync(int id)
         {
             var product = _products.FirstOrDefault(product => product.ProductId == id);
@@ -207,6 +217,7 @@ public class ProductServiceTests
             return Task.FromResult(product);
         }
 
+        // Creates a new product in the fake repository, assigns it a new ProductId, and returns the created product with its related entities (Category, ProductStatus, Inventory)
         public Task<Product> CreateAsync(Product product)
         {
             product.ProductId = _products.Max(existingProduct => existingProduct.ProductId) + 1;
@@ -233,6 +244,7 @@ public class ProductServiceTests
             return Task.FromResult(product);
         }
 
+        // Checks if a product with the given SKU already exists in the fake repository (case-insensitive)
         public Task<bool> SKUExistsAsync(string sku)
         {
             var exists = _products.Any(product =>
