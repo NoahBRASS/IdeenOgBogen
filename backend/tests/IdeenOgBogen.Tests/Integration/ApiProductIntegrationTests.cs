@@ -41,8 +41,10 @@ public class ApiProductIntegrationTests : IClassFixture<RealMySqlWebApplicationF
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
+        // Read the products from the response contentas a list of ProductResponseDto objects, which include the related entities (CategoryName, StatusName, Quantity)
         var products = await response.Content.ReadFromJsonAsync<List<ProductResponseDto>>();
 
+        // Assert that the products list is not null, contains products, and includes the expected product names from the real MySQL database
         Assert.NotNull(products);
         Assert.NotEmpty(products);
         Assert.Contains(products, product => product.Name == "Clean Code");
@@ -73,8 +75,10 @@ public class ApiProductIntegrationTests : IClassFixture<RealMySqlWebApplicationF
         // Assert POST
         Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
 
+        // Read the created product from the POST response to get its ID for the subsequent GET request
         var createdProduct = await postResponse.Content.ReadFromJsonAsync<ProductResponseDto>();
 
+        // Assert the created product details
         Assert.NotNull(createdProduct);
         Assert.True(createdProduct.ProductId > 0);
         Assert.Equal("Real API Integration Book", createdProduct.Name);
@@ -88,8 +92,10 @@ public class ApiProductIntegrationTests : IClassFixture<RealMySqlWebApplicationF
         // Assert GET by ID
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
+        // Read the fetched product from the GET response
         var fetchedProduct = await getResponse.Content.ReadFromJsonAsync<ProductResponseDto>();
 
+        // Assert the fetched product details match the created product
         Assert.NotNull(fetchedProduct);
         Assert.Equal(createdProduct.ProductId, fetchedProduct.ProductId);
         Assert.Equal(createdProduct.SKU, fetchedProduct.SKU);
@@ -160,6 +166,7 @@ public class RealMySqlWebApplicationFactory : WebApplicationFactory<Program>
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+            // Ensure the test database is clean before each test run
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
         });
