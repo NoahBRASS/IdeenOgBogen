@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -23,6 +24,7 @@
     <ProjectReference Include="..\..\src\IdeenOgBogen.Application\IdeenOgBogen.Application.csproj" />
     <ProjectReference Include="..\..\src\IdeenOgBogen.Domain\IdeenOgBogen.Domain.csproj" />
     <ProjectReference Include="..\..\src\IdeenOgBogen.Infrastructure\IdeenOgBogen.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\IdeenOgBogen.Api\IdeenOgBogen.Api.csproj" />
   </ItemGroup>
 
 </Project>

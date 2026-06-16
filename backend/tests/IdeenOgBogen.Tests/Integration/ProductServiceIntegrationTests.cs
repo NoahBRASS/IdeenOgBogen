@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdeenOgBogen.Tests.Integration;
 
-// The ProductServiceIntegrationTests class contains integration tests for the ProductService, which manages products and interacts with the ProductRepository to perform operations on the database. These tests ensure that the service correctly retrieves, creates, and validates products in the database, including their related entities (Category, ProductStatus, Inventory).
+// The ProductServiceIntegrationTests class contains integration tests for the ProductService, which manages products and interacts with the 
+// ProductRepository to perform operations on the database. These tests ensure that the service correctly retrieves, creates, and validates 
+// products in the database, including their related entities (Category, ProductStatus, Inventory).
 public class ProductServiceIntegrationTests
 {
     private static async Task<(AppDbContext Context, ProductService Service)> CreateServiceAsync(SqliteConnection connection)
